@@ -23,10 +23,10 @@ def cent_dif(f1, f2):
 def fileWrite(n, des, arr, fun, tuning):
     c = tuning * (2 ** ((-9 + fun) / 12))
     f = open(n, "w+", encoding="utf-8")
-    f.write(f"!\t{n}\n!\n{des}\n\t{len(arr)}\n!\n")
+    f.write(f"! {n}\n!\n{des}\n {len(arr)}\n!\n")
     for i in range(0, len(arr)):
         aux = arr[i]
-        f.write(f"\t{'{0:.5f}'.format(cent_dif(aux, c))}\n")
+        f.write(f" {'{0:.5f}'.format(cent_dif(aux, c))}\n")
     f.close()
     print("\n\nSCL File created")
 
@@ -44,12 +44,9 @@ if __name__ == "__main__":
             retune_cents = int(input("How many cents?: "))
         else:
             retune_cents = 0
-        tun = tun*(2**(retune_cents/1200))
+        retun = tun*(2**(retune_cents/1200))
 
-        if (interval - a > 0):
-            i = (interval - a) % 12
-        else:
-            i = (interval - a) + 12
+        i = (interval - a)
         interval -= fundamental
         if (interval < 0):
             interval += 12
@@ -57,20 +54,26 @@ if __name__ == "__main__":
             f = (fundamental - a) % 12
         else:
             f = fundamental - a
-        freq1 = tun * (2 ** (f / 12))
-        if(fundamental != 0):
-            freq2 = tun * (2 ** (i / 12))*(1/r)
-        else: freq2 = freq1*(2**(interval/12))*(1/r)
+
+        freq1 = retun * (2 ** (f / 12))
+        freq2 = freq1 * (2**(interval/12))*(1/r)
 
         # cents = math.ceil(cents(freq1, freq2))
-        cents = cent_dif(freq2, freq1)
+        cents = cent_dif(freq1, freq2)
         print(f"Cents of difference between fundamental {'{0:.5f}'.format(freq1)} Hz TET and {'{0:.5f}'.format(freq2)} Hz JI: >>> {'{0:.5f}'.format(abs(cents))} cents")
         if(cents > 0):
-            print(f">>> Retuned by +{round(cents)} cents <<<")
-        else: print(f">>> Retuned by {round(cents)} cents <<<")
+            print(f">>> Retune  JI by +{round(cents)} cents <<<")
+            print(f">>> Retune TET by {round(-cents)} cents <<<")
+        else:
+            print(f">>> Retune  JI by {round(cents)} cents <<<")
+            print(f">>> Retune TET by +{round(-cents)} cents <<<")
+
         retune = input("\nShow retuning? [y/n]: ")
         if (retune == 'y'):
-            nfrq = freq2
+            if rtn_cnts == 'y':
+                nfrq = freq1
+            else:
+                nfrq = freq2
             aux = input("\nChord in pitch class form: ")
             acordes = []
             for j in aux:
